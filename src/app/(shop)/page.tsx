@@ -1,5 +1,5 @@
 import { ProductGrid, Title } from "@/components";
-import { titleFont } from "@/config/fonts";
+/*import { titleFont } from "@/config/fonts";*/
 import { initialData } from "@/seed/seed";
 
 const products = initialData.products;
