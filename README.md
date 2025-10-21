@@ -44,6 +44,7 @@ El proyecto está configurado para mostrar cómo estructurar una aplicación con
 git clone https://github.com/Carol-20-Cruz/PROGRAMACIONCRUZ.git
 📂 **Navega al directorio del proyecto:**
 **bash**
+
 cd PROGRAMACIONCRUZ
 
 ⚙️ **Instala las dependencias:**
