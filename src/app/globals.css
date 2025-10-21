@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* Variables globales */
+:root {
+  --primary: #274494;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/* Modo oscuro (comentado por ahora) */
+/*
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+*/
+
+/* Estilos base */
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(var(--background-start-rgb))
+  ) rgb(var(--background-end-rgb));
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.fade-in {
+  -webkit-animation-duration: 0.5s;
+  animation-duration: 0.5s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
+/* Botones */
+.btn-primary {
+  background-color: #2563eb; /* Tailwind bg-blue-600 */
+  color: white;
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  border-radius: 0.25rem; /* rounded */
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #1e40af; /* Tailwind hover:bg-blue-800 */
+}
+
+.btn-secondary {
+  background-color: #e5e7eb; /* ejemplo: bg-gray-200 */
+  color: #1f2937; /* ejemplo: text-gray-800 */
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db; /* ejemplo: hover:bg-gray-300 */
+}
