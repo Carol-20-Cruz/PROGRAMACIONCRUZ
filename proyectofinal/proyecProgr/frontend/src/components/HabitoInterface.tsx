@@ -192,7 +192,7 @@ const HabitInterface: React.FC<HabitInterfaceProps> = ({ backendName }) => {
   
   // --- Render ---
   return (
-    <div className={`w-full max-w-3xl p-6 my-4 rounded-lg shadow-lg ${theme.bg}`}>
+    <div className={`w-full max-w-6xl p-6 my-4 rounded-lg shadow-lg ${theme.bg}`}>
       <div className="text-center mb-6">
         <img
           src="/logo.png"

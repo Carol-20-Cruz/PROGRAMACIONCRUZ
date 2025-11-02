@@ -203,7 +203,7 @@ func getRegistros(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(`
 			SELECT 
-				r.id, r.fecha, r.completado, r.notas, r.habito_id,
+				r.id AS id, r.fecha AS fecha, r.completado AS completado, r.notas AS notas, r.habito_id AS habito_id,
 				COALESCE(h.nombre, '') AS habito_nombre,
 				COALESCE(h.descripcion, '') AS habito_descripcion,
 				COALESCE(h.meta_frecuencia, '') AS habito_meta

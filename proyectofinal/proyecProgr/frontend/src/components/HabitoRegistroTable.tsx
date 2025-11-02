@@ -18,19 +18,16 @@ interface Registro {
   notas: string;
 }
 
-const HabitoRegistroTable: React.FC = () => {
+interface Props {
+  refreshTrigger?: number; // <- cada vez que cambia, se recarga la tabla
+}
+
+const HabitoRegistroTable: React.FC<Props> = ({ refreshTrigger }) => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const [habitos, setHabitos] = useState<Habito[]>([]);
   const [registros, setRegistros] = useState<Registro[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Map de hábitos por id
-  const habitoMap = React.useMemo(() => {
-    const map: Record<number, Habito> = {};
-    habitos.forEach((h) => (map[h.id] = h));
-    return map;
-  }, [habitos]);
 
   const fetchHabitos = async () => {
     try {
@@ -55,31 +52,33 @@ const HabitoRegistroTable: React.FC = () => {
     }
   };
 
+  const fetchData = async () => {
+    setLoading(true);
+    await fetchHabitos();
+    await fetchRegistros();
+    setLoading(false);
+  };
+
+  // Se ejecuta al montar y cuando cambia refreshTrigger
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      await fetchHabitos();
-      await fetchRegistros();
-      setLoading(false);
-    };
     fetchData();
-  }, []);
+  }, [refreshTrigger]);
 
   // --- Combinar hábitos con registros ---
   const combinedData = React.useMemo(() => {
-  return habitos.map((h) => {
-    const registro = registros.find((r) => r.habito_id === h.id);
-    return {
-      nombre: h.nombre || "-",
-      habito: h.descripcion || "-",
-      meta: h.meta_frecuencia || "-",
-      fecha: registro?.fecha || "-",
-      completado: registro ? (registro.completado ? "✅" : "❌") : "❌",
-      nota: registro?.notas || "-",
-      id: h.id,
-    };
-  });
-}, [habitos, registros]);
+    return habitos.map((h) => {
+      const registro = registros.find((r) => r.habito_id === h.id);
+      return {
+        nombre: h.nombre || "-",
+        habito: h.descripcion || "-",
+        meta: h.meta_frecuencia || "-",
+        fecha: registro?.fecha || "-",
+        completado: registro ? (registro.completado ? "✅" : "❌") : "❌",
+        nota: registro?.notas || "-",
+        id: h.id,
+      };
+    });
+  }, [habitos, registros]);
 
   return (
     <div className="w-full overflow-x-auto p-4 bg-white rounded-2xl shadow-md">
@@ -102,23 +101,26 @@ const HabitoRegistroTable: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {combinedData.length === 0 && (
+            {combinedData.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center py-4 text-gray-400">
                   No hay registros
                 </td>
               </tr>
+            ) : (
+              combinedData.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-50 transition">
+                  <td className="py-2 px-4 border-b">{row.nombre}</td>
+                  <td className="py-2 px-4 border-b">{row.habito}</td>
+                  <td className="py-2 px-4 border-b">{row.meta}</td>
+                  <td className="py-2 px-4 border-b">{row.fecha}</td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {row.completado}
+                  </td>
+                  <td className="py-2 px-4 border-b">{row.nota}</td>
+                </tr>
+              ))
             )}
-            {combinedData.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50 transition">
-                <td className="py-2 px-4 border-b">{row.nombre}</td>
-                <td className="py-2 px-4 border-b">{row.habito}</td>
-                <td className="py-2 px-4 border-b">{row.meta}</td>
-                <td className="py-2 px-4 border-b">{row.fecha}</td>
-                <td className="py-2 px-4 border-b text-center">{row.completado}</td>
-                <td className="py-2 px-4 border-b">{row.nota}</td>
-              </tr>
-            ))}
           </tbody>
         </table>
       )}

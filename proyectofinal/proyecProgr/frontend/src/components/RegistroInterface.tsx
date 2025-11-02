@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import HabitoRegistroTable from "./HabitoRegistroTable";
 
 // --- Interfaces ---
 interface Habito {
@@ -9,10 +10,11 @@ interface Habito {
   nombre: string;
   descripcion: string;
   meta_frecuencia: string;
+  habito_id?: number;
 }
 
 interface Registro {
-  habito_nombre: string;
+  nombre: string;
   id?: number;
   habito_id: number;
   fecha: string;
@@ -25,7 +27,7 @@ interface RegistroInterfaceProps {
 }
 
 const RegistroInterface: React.FC<RegistroInterfaceProps> = ({ backendName }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   // --- Estados ---
   const [registros, setRegistros] = useState<Registro[]>([]);
@@ -56,7 +58,7 @@ const RegistroInterface: React.FC<RegistroInterfaceProps> = ({ backendName }) =>
   const obtenerHabitos = async () => {
     setLoadingError(null);
     try {
-      const res = await axios.get(`${baseUrl}/api/habitos`);
+      const res = await axios.get<Habito[]>(`${baseUrl}/api/habitos`);
       setHabitos(res.data);
       console.log("✅ Hábitos cargados:", res.data);
     } catch (error) {
@@ -68,7 +70,7 @@ const RegistroInterface: React.FC<RegistroInterfaceProps> = ({ backendName }) =>
   // --- Obtener registros ---
   const obtenerRegistros = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/api/registros`);
+      const res = await axios.get<any[]>(`${baseUrl}/api/registros`);
 
 const dataNormalizada = res.data.map((r: any, index: number) => ({
   ...r,
@@ -77,9 +79,9 @@ const dataNormalizada = res.data.map((r: any, index: number) => ({
 }));
 
 const sorted = [...dataNormalizada].sort((a, b) => b.id - a.id);
+
 setRegistros(sorted);
 
-console.log("📋 Registros cargados (normalizados):", sorted);
 
     } catch (error) {
       console.error("Error obteniendo registros:", error);
@@ -90,8 +92,6 @@ console.log("📋 Registros cargados (normalizados):", sorted);
     obtenerHabitos();
     obtenerRegistros();
   }, []);
-
-
 
   useEffect(() => {
   if (habitos.length > 0 && nuevoRegistro.habito_id === 0) {
@@ -114,6 +114,8 @@ console.log("📋 Registros cargados (normalizados):", sorted);
     });
   };
 
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (nuevoRegistro.habito_id === 0) {
@@ -124,6 +126,7 @@ console.log("📋 Registros cargados (normalizados):", sorted);
     try {
       await axios.post(`${baseUrl}/api/registros`, nuevoRegistro);
       obtenerRegistros();
+      setRefreshTrigger(Date.now());
       setNuevoRegistro({
         habito_id: 0,
         fecha: new Date().toISOString().substring(0, 10),
@@ -139,7 +142,7 @@ console.log("📋 Registros cargados (normalizados):", sorted);
   // --- Renderizado ---
   return (
     <div
-      className={`max-w-3xl mx-auto mt-8 p-8 rounded-3xl shadow-xl border ${
+      className={`max-w-7xl mx-auto mt-8 p-10 rounded-3xl shadow-xl border ${
         colorThemes[backendName] || "bg-gray-100 border-gray-300"
       }`}
     >
@@ -244,7 +247,7 @@ console.log("📋 Registros cargados (normalizados):", sorted);
 
       {/* HISTORIAL */}
       {/* HISTORIAL */}
-<div className="mt-12">
+  <div className="mt-12">
   <h3 className="text-2xl font-bold mb-5 text-center text-gray-700">
     Historial de Registros
   </h3>
@@ -261,8 +264,8 @@ console.log("📋 Registros cargados (normalizados):", sorted);
             className="border border-gray-300 rounded-lg p-4 bg-white hover:shadow-md transition"
           >
             <p className="font-bold text-lg text-blue-700 mb-1">
-              ID: {r.habito_id || "N/A"} — 👤 {r.habito_nombre || habito?.nombre || "Sin nombre"} — 💪{" "}
-              {habito?.descripcion || "Sin descripción"}
+              ID: {r.id || "N/A"} — 👤 {r.nombre || habito?.nombre || "Sin nombre"} — 💪{" "}
+              {r.notas || "Sin descripción"}
             </p>
             <p className="text-gray-700 text-sm italic mb-2">
               Meta: {habito?.meta_frecuencia || "No definida"}
@@ -278,6 +281,11 @@ console.log("📋 Registros cargados (normalizados):", sorted);
     </div>
     )}
    </div>
+
+    <div className="mt-16">
+        <HabitoRegistroTable refreshTrigger={refreshTrigger} />
+    </div>
+
     </div> 
   );
 };
